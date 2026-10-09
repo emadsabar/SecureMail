@@ -2,7 +2,6 @@ using System.DirectoryServices.Protocols;
 using System.Net;
 using Microsoft.Extensions.Options;
 using SmimeLifecycle.Application.Abstractions;
-using SmimeLifecycle.Domain.Enums;
 
 namespace SmimeLifecycle.Infrastructure.Directory;
 
@@ -23,7 +22,7 @@ public sealed class LdapsActiveDirectoryPublisher(IOptions<ActiveDirectoryOption
     public Task PublishPublicCertificateAsync(
         string distinguishedName,
         byte[] derEncodedCertificate,
-        DirectoryAttribute attribute,
+        Domain.Enums.DirectoryAttribute attribute,
         CancellationToken cancellationToken)
     {
         var o = options.Value;
@@ -33,7 +32,7 @@ public sealed class LdapsActiveDirectoryPublisher(IOptions<ActiveDirectoryOption
                 "AD bind credentials are not configured. Store them in Key Vault and map BindUser/BindPassword from secret names.");
         }
 
-        var identifierLdap = attribute == DirectoryAttribute.UserSmimeCertificate
+        var identifierLdap = attribute == Domain.Enums.DirectoryAttribute.UserSmimeCertificate
             ? "userSMIMECertificate"
             : "userCertificate;binary";
 
@@ -65,6 +64,6 @@ public sealed class NullActiveDirectoryPublisher : IActiveDirectoryPublisher
     public Task PublishPublicCertificateAsync(
         string distinguishedName,
         byte[] derEncodedCertificate,
-        DirectoryAttribute attribute,
+        Domain.Enums.DirectoryAttribute attribute,
         CancellationToken cancellationToken) => Task.CompletedTask;
 }

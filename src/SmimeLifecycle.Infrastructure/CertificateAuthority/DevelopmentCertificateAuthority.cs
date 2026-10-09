@@ -44,7 +44,10 @@ public sealed class DevelopmentCertificateAuthority : ICertificateAuthority
 
     private string SignCsr(string csrPem)
     {
-        var csr = CertificateRequest.LoadSigningRequestPem(csrPem);
+        var csr = CertificateRequest.LoadSigningRequestPem(
+            csrPem,
+            HashAlgorithmName.SHA256,
+            CertificateRequestLoadOptions.Default);
         var notBefore = DateTimeOffset.UtcNow.AddMinutes(-5);
         var notAfter = DateTimeOffset.UtcNow.AddYears(1);
         using var issued = csr.Create(_issuer, notBefore, notAfter, BitConverter.GetBytes(RandomNumberGenerator.GetInt32(int.MaxValue)));
