@@ -1,50 +1,45 @@
-# SmimeLifecycle
+# SmimeLifecycle — Certificate Management Server
 
-Centralized enterprise **S/MIME certificate lifecycle** management for Microsoft 365 / Exchange Online with hybrid Active Directory.
+On-premises **S/MIME certificate lifecycle** platform. The CMS manages eligibility, enrollment, issuance tracking, endpoint installation, Active Directory publication, Outlook readiness, renewal, revocation, and audit.
 
-This product manages Sectigo-issued (or development CA) S/MIME certificates: eligibility, endpoint enrollment, issuance tracking, CurrentUser\My installation, AD publication, Entra Connect sync confirmation, Outlook readiness, renewal, revocation, and audit.
+**Not** a mail gateway, SMTP relay, DLP, archive, or content scanner.
 
-It is **not** a secure email gateway, SMTP relay, DLP platform, archive, or content-scanning system.
+## Deployment model
 
-## Phase 1 scenario
+- **On-premises Active Directory only** for identity, eligibility, and public-certificate publication.
+- **No cloud identity / Entra ID / Microsoft Graph / Entra Connect** in this model.
+- Windows agents and the admin UI talk **only to the CMS**.
+- The CMS is the **only** component that talks to the certificate authority (Sectigo or lab Development CA).
 
-Microsoft 365 Exchange Online + Entra ID + on-premises AD + Entra Connect + managed Windows devices + classic Outlook for Windows + Sectigo S/MIME.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-Vertical slice:
+## Vertical slice
 
 ```text
-Entra eligibility → local key/CSR on Windows → CA request → issuance
-→ install CurrentUser\My → publish AD → Entra Connect sync → Outlook check → Active
+AD eligibility → CMS enrollment → endpoint CSR → CMS→CA issuance
+→ CurrentUser\My install → AD publish → Outlook check → Active
 ```
 
 ## Solution layout
 
 | Path | Role |
 |---|---|
-| `src/SmimeLifecycle.Api` | ASP.NET Core Web API |
-| `src/SmimeLifecycle.Application` | MediatR commands/queries, FluentValidation |
+| `src/SmimeLifecycle.Api` | Certificate Management Server API |
+| `src/SmimeLifecycle.Application` | MediatR commands/queries |
 | `src/SmimeLifecycle.Domain` | Entities and lifecycle state machine |
-| `src/SmimeLifecycle.Infrastructure` | EF Core/PostgreSQL, Hangfire, Sectigo/AD adapters |
-| `src/SmimeLifecycle.WindowsAgent` | Endpoint worker: CSR, install, status |
-| `src/SmimeLifecycle.OutlookAddIn` | Classic Outlook configuration adapter |
+| `src/SmimeLifecycle.Infrastructure` | EF Core, Hangfire, **CA adapter**, AD adapters |
+| `src/SmimeLifecycle.WindowsAgent` | Endpoint worker (CMS client only) |
+| `src/SmimeLifecycle.OutlookAddIn` | Classic Outlook adapter |
 | `src/SmimeLifecycle.Worker` | Background Hangfire host |
-| `frontend/admin` | React + TypeScript + Vite + Fluent UI |
-| `scripts/` | PowerShell runbooks (AD, Intune, Entra Connect) |
-| `tests/` | xUnit unit tests |
+| `frontend/admin` | React admin UI (CMS client) |
+| `scripts/` | PowerShell AD / packaging runbooks |
 
 ## Constraints
 
-- Private keys, PFX passwords, access tokens, and complete PFX files are **not** stored in the backend database.
-- Private keys and CSRs are generated on the managed Windows endpoint (prefer non-exportable).
-- Sectigo API details stay behind `ICertificateAuthority` and configuration; endpoint names are not invented.
-- Outlook configuration is a replaceable adapter.
-
-## Prerequisites
-
-- .NET 8 SDK (or newer SDK targeting `net8.0`)
-- Node.js 22+
-- Docker Desktop (PostgreSQL via Compose)
-- PowerShell 7 for operational scripts
+- Private keys / PFX / tokens are never stored in PostgreSQL.
+- Keys and CSRs are generated on the Windows endpoint.
+- CA HTTP details stay behind `ICertificateAuthority` and configuration (do not invent Sectigo routes).
+- Agents must not reference Infrastructure or call the CA.
 
 ## Local development
 
@@ -54,7 +49,6 @@ dotnet restore
 dotnet test
 dotnet run --project src/SmimeLifecycle.Api
 
-# separate terminal
 cd frontend/admin
 npm ci
 npm run dev
@@ -62,20 +56,15 @@ npm run dev
 
 - API / Swagger: http://localhost:5088/swagger  
 - Admin UI: http://localhost:5173  
-- Hangfire: http://localhost:5088/hangfire  
 
-Development defaults:
+Lab defaults:
 
-- `Authentication:Mode` = `Development` (no Entra token required)
-- `CertificateAuthority:Provider` = `Development` (local CSR signer for lab use)
-- `ActiveDirectory:Provider` = `Null` (records publication without LDAPS)
+- `CertificateAuthority:Provider` = `Development` (CMS-local signer)
+- `IdentityDirectory:Provider` = `Configured` (sample AD users in appsettings)
+- `ActiveDirectory:Provider` = `Null` (publication recorded without LDAPS)
 
-Set `CertificateAuthority:Provider` to `Sectigo` and fill configured path templates when wiring a real Certificate Manager tenant. Set `ActiveDirectory:Provider` to `Ldaps` with Key Vault–backed bind credentials for directory publication.
+Production-oriented on-prem settings:
 
-## Admin UI env
-
-Copy `frontend/admin/.env.example`. Leave `VITE_API_BASE_URL` empty to use the Vite proxy. For Entra ID later, set `VITE_AUTH_MODE=EntraId` and the MSAL client/tenant/scope values.
-
-## CI
-
-GitHub Actions (`.github/workflows/ci.yml`) restores/tests the .NET solution and builds `frontend/admin`.
+- `IdentityDirectory:Provider` = `ActiveDirectory` + `EligibleGroupDn`
+- `ActiveDirectory:Provider` = `Ldaps` with bind credentials from a secrets store
+- `CertificateAuthority:Provider` = `Sectigo` with **documented** BaseUrl/paths only

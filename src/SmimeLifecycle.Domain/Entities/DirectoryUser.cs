@@ -4,11 +4,12 @@ namespace SmimeLifecycle.Domain.Entities;
 
 public sealed class DirectoryUser : Entity
 {
-    public string EntraObjectId { get; private set; } = string.Empty;
+    /// <summary>Active Directory objectGUID (string form) for the user.</summary>
+    public string DirectoryObjectGuid { get; private set; } = string.Empty;
     public string UserPrincipalName { get; private set; } = string.Empty;
     public string Mail { get; private set; } = string.Empty;
     public string DisplayName { get; private set; } = string.Empty;
-    public string? OnPremisesDistinguishedName { get; private set; }
+    public string? DistinguishedName { get; private set; }
     public bool IsEligible { get; private set; }
     public string? EligibilityReason { get; private set; }
 
@@ -17,21 +18,21 @@ public sealed class DirectoryUser : Entity
     }
 
     public static DirectoryUser Create(
-        string entraObjectId,
+        string directoryObjectGuid,
         string userPrincipalName,
         string mail,
         string displayName,
-        string? onPremisesDistinguishedName,
+        string? distinguishedName,
         bool isEligible,
         string? eligibilityReason)
     {
         return new DirectoryUser
         {
-            EntraObjectId = entraObjectId,
+            DirectoryObjectGuid = directoryObjectGuid,
             UserPrincipalName = userPrincipalName,
             Mail = mail,
             DisplayName = displayName,
-            OnPremisesDistinguishedName = onPremisesDistinguishedName,
+            DistinguishedName = distinguishedName,
             IsEligible = isEligible,
             EligibilityReason = eligibilityReason
         };
@@ -46,7 +47,7 @@ public sealed class DirectoryUser : Entity
 
     public void UpdateDirectoryBinding(string? distinguishedName)
     {
-        OnPremisesDistinguishedName = distinguishedName;
+        DistinguishedName = distinguishedName;
         Touch();
     }
 }

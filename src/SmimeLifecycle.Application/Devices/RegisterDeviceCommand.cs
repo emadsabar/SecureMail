@@ -14,7 +14,7 @@ public sealed record RegisterDeviceCommand(
     string Hostname,
     string OsVersion,
     string AgentVersion,
-    string? EntraDeviceId,
+    string? AdComputerObjectGuid,
     string EnrollmentSecret) : IRequest<Guid>;
 
 public sealed class RegisterDeviceCommandHandler(
@@ -32,7 +32,7 @@ public sealed class RegisterDeviceCommandHandler(
 
         if (device is null)
         {
-            device = ManagedDevice.Register(user.Id, request.Hostname, request.OsVersion, request.AgentVersion, hash, request.EntraDeviceId);
+            device = ManagedDevice.Register(user.Id, request.Hostname, request.OsVersion, request.AgentVersion, hash, request.AdComputerObjectGuid);
             db.ManagedDevices.Add(device);
         }
         else

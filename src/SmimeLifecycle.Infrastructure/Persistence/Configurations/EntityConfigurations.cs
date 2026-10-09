@@ -9,7 +9,7 @@ internal sealed class DirectoryUserConfiguration : IEntityTypeConfiguration<Dire
     public void Configure(EntityTypeBuilder<DirectoryUser> builder)
     {
         builder.ToTable("directory_users");
-        builder.HasIndex(x => x.EntraObjectId).IsUnique();
+        builder.HasIndex(x => x.DirectoryObjectGuid).IsUnique();
         builder.HasIndex(x => x.UserPrincipalName).IsUnique();
         builder.Property(x => x.UserPrincipalName).HasMaxLength(320);
         builder.Property(x => x.Mail).HasMaxLength(320);

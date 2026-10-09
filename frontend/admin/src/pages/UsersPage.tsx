@@ -113,7 +113,7 @@ export function UsersPage() {
   return (
     <>
       <Title3>Eligible users</Title3>
-      <Text>Sync Entra-eligible identities, then start endpoint-driven enrollment.</Text>
+      <Text>Sync AD-eligible identities, then start endpoint enrollment via the CMS (no direct CA calls).</Text>
       <div className={styles.toolbar}>
         <Input
           value={upn}

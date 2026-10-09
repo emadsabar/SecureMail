@@ -1,5 +1,10 @@
 namespace SmimeLifecycle.Application.Abstractions;
 
+/// <summary>
+/// Outbound CA integration used exclusively by the Certificate Management Server.
+/// Windows agents, Outlook add-ins, and browsers must never call the CA; they call the CMS API only.
+/// Implementations live in SmimeLifecycle.Infrastructure and are registered only on the CMS host.
+/// </summary>
 public sealed record CertificateAuthorityRequest(
     string CsrPem,
     string Subject,

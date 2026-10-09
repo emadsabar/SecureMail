@@ -52,7 +52,7 @@ function Shell() {
       <header className={styles.header}>
         <Title2 className={styles.brand}>SmimeLifecycle</Title2>
         <Text>
-          Centralized S/MIME certificate lifecycle — not a mail gateway, DLP, or archive.
+          On-premises Certificate Management Server for S/MIME — clients never call the CA.
         </Text>
         <TabList
           selectedValue={selected}

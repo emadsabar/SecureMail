@@ -20,7 +20,7 @@ public sealed class EnrollmentWorker(
             Hostname = Environment.MachineName,
             OsVersion = Environment.OSVersion.VersionString,
             AgentVersion = "1.0.0",
-            o.EntraDeviceId,
+            o.AdComputerObjectGuid,
             o.EnrollmentSecret
         }, stoppingToken);
         logger.LogInformation("Registered Windows agent device {DeviceId}", _deviceId);

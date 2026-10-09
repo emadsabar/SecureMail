@@ -17,7 +17,7 @@ public sealed class AgentController(IMediator mediator) : ControllerBase
         string Hostname,
         string OsVersion,
         string AgentVersion,
-        string? EntraDeviceId,
+        string? AdComputerObjectGuid,
         string EnrollmentSecret);
 
     [HttpPost("devices")]
@@ -29,7 +29,7 @@ public sealed class AgentController(IMediator mediator) : ControllerBase
                 request.Hostname,
                 request.OsVersion,
                 request.AgentVersion,
-                request.EntraDeviceId,
+                request.AdComputerObjectGuid,
                 request.EnrollmentSecret),
             cancellationToken);
         return Ok(id);

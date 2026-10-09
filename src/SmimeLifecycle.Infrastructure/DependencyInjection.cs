@@ -50,7 +50,15 @@ public static class DependencyInjection
             services.AddSingleton<IActiveDirectoryPublisher, NullActiveDirectoryPublisher>();
         }
 
-        services.AddSingleton<IIdentityDirectory, ConfiguredIdentityDirectory>();
+        var identityProvider = configuration.GetValue<string>("IdentityDirectory:Provider") ?? "Configured";
+        if (string.Equals(identityProvider, "ActiveDirectory", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddSingleton<IIdentityDirectory, ActiveDirectoryIdentityDirectory>();
+        }
+        else
+        {
+            services.AddSingleton<IIdentityDirectory, ConfiguredIdentityDirectory>();
+        }
 
         if (!configuration.GetValue("Hangfire:Disabled", false))
         {

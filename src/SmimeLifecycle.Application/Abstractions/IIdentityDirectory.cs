@@ -1,12 +1,15 @@
 namespace SmimeLifecycle.Application.Abstractions;
 
+/// <summary>
+/// On-premises directory identity source (Active Directory). Not a cloud identity provider.
+/// </summary>
 public sealed record IdentityUserSnapshot(
-    string EntraObjectId,
+    string DirectoryObjectGuid,
     string UserPrincipalName,
     string Mail,
     string DisplayName,
-    string? OnPremisesDistinguishedName,
-    IReadOnlyCollection<string> GroupIds);
+    string? DistinguishedName,
+    IReadOnlyCollection<string> GroupDns);
 
 public interface IIdentityDirectory
 {

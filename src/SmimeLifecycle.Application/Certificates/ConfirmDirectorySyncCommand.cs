@@ -26,7 +26,7 @@ public sealed class ConfirmDirectorySyncCommandHandler(
             "DirectorySyncConfirmed",
             nameof(IssuedCertificate),
             certificate.Id,
-            "Entra Connect synchronization of userCertificate/userSMIMECertificate observed or confirmed.",
+            "On-premises Active Directory publication of userCertificate/userSMIMECertificate verified.",
             cancellationToken);
     }
 }

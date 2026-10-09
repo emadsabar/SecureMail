@@ -25,7 +25,7 @@ export type UserListItem = {
   mail: string
   displayName: string
   isEligible: boolean
-  onPremisesDistinguishedName?: string | null
+  distinguishedName?: string | null
 }
 
 export type AuditLogItem = {

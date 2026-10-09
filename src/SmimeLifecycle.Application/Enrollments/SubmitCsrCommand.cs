@@ -52,7 +52,7 @@ public sealed class SubmitCsrCommandHandler(
             "CsrSubmitted",
             nameof(CertificateEnrollment),
             enrollment.Id,
-            "CSR submitted to certificate authority adapter.",
+            "CSR accepted by CMS and submitted to the certificate authority by the server only.",
             cancellationToken);
     }
 }

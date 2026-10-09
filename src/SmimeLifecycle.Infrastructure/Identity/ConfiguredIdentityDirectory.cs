@@ -6,22 +6,24 @@ namespace SmimeLifecycle.Infrastructure.Identity;
 public sealed class IdentityDirectoryOptions
 {
     public const string SectionName = "IdentityDirectory";
+    /// <summary>Configured | ActiveDirectory</summary>
+    public string Provider { get; set; } = "Configured";
     public List<ConfiguredIdentityUser> Users { get; set; } = [];
-    public string? EligibleGroupId { get; set; }
+    /// <summary>AD group DN whose members are S/MIME eligible.</summary>
+    public string? EligibleGroupDn { get; set; }
 }
 
 public sealed class ConfiguredIdentityUser
 {
-    public string EntraObjectId { get; set; } = Guid.NewGuid().ToString();
+    public string DirectoryObjectGuid { get; set; } = Guid.NewGuid().ToString();
     public string UserPrincipalName { get; set; } = string.Empty;
     public string Mail { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
-    public string? OnPremisesDistinguishedName { get; set; }
+    public string? DistinguishedName { get; set; }
 }
 
 /// <summary>
-/// Development/test identity source. Production should replace this with a Microsoft Graph adapter
-/// that reads Entra ID users and group membership using application permissions.
+/// Lab/dev identity source. Production on-premises deployments use <see cref="ActiveDirectoryIdentityDirectory"/>.
 /// </summary>
 public sealed class ConfiguredIdentityDirectory(IOptions<IdentityDirectoryOptions> options) : IIdentityDirectory
 {
@@ -39,5 +41,5 @@ public sealed class ConfiguredIdentityDirectory(IOptions<IdentityDirectoryOption
     }
 
     private static IdentityUserSnapshot Map(ConfiguredIdentityUser u) =>
-        new(u.EntraObjectId, u.UserPrincipalName, u.Mail, u.DisplayName, u.OnPremisesDistinguishedName, []);
+        new(u.DirectoryObjectGuid, u.UserPrincipalName, u.Mail, u.DisplayName, u.DistinguishedName, []);
 }

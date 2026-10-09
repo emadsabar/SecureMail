@@ -18,23 +18,25 @@ public sealed class SyncEligibleUserCommandHandler(
         var snapshot = await identity.GetByUserPrincipalNameAsync(request.UserPrincipalName, cancellationToken)
                        ?? throw new InvalidOperationException($"User '{request.UserPrincipalName}' was not found in the identity directory.");
 
-        var user = await db.DirectoryUsers.FirstOrDefaultAsync(u => u.EntraObjectId == snapshot.EntraObjectId, cancellationToken);
+        var user = await db.DirectoryUsers.FirstOrDefaultAsync(
+            u => u.DirectoryObjectGuid == snapshot.DirectoryObjectGuid,
+            cancellationToken);
         if (user is null)
         {
             user = DirectoryUser.Create(
-                snapshot.EntraObjectId,
+                snapshot.DirectoryObjectGuid,
                 snapshot.UserPrincipalName,
                 snapshot.Mail,
                 snapshot.DisplayName,
-                snapshot.OnPremisesDistinguishedName,
+                snapshot.DistinguishedName,
                 isEligible: true,
-                eligibilityReason: "Matched Phase 1 eligibility policy.");
+                eligibilityReason: "Matched on-premises Active Directory eligibility policy.");
             db.DirectoryUsers.Add(user);
         }
         else
         {
-            user.UpdateEligibility(true, "Matched Phase 1 eligibility policy.");
-            user.UpdateDirectoryBinding(snapshot.OnPremisesDistinguishedName);
+            user.UpdateEligibility(true, "Matched on-premises Active Directory eligibility policy.");
+            user.UpdateDirectoryBinding(snapshot.DistinguishedName);
         }
 
         await db.SaveChangesAsync(cancellationToken);

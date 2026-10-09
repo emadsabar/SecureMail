@@ -24,7 +24,7 @@ public sealed class PublishCertificatesCommandHandler(
         foreach (var certificate in candidates)
         {
             var user = await db.DirectoryUsers.FirstAsync(u => u.Id == certificate.DirectoryUserId, cancellationToken);
-            if (string.IsNullOrWhiteSpace(user.OnPremisesDistinguishedName))
+            if (string.IsNullOrWhiteSpace(user.DistinguishedName))
             {
                 continue;
             }
@@ -41,7 +41,7 @@ public sealed class PublishCertificatesCommandHandler(
                 try
                 {
                     await publisher.PublishPublicCertificateAsync(
-                        user.OnPremisesDistinguishedName,
+                        user.DistinguishedName,
                         der,
                         publication.Attribute,
                         cancellationToken);

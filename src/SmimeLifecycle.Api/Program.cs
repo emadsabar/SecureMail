@@ -1,5 +1,4 @@
 using Hangfire;
-using Microsoft.Identity.Web;
 using Serilog;
 using SmimeLifecycle.Application;
 using SmimeLifecycle.Infrastructure;
@@ -23,9 +22,11 @@ try
     {
         options.SwaggerDoc("v1", new()
         {
-            Title = "SmimeLifecycle API",
+            Title = "SmimeLifecycle Certificate Management Server",
             Version = "v1",
-            Description = "S/MIME certificate lifecycle management. Not a mail gateway, relay, DLP, or archive."
+            Description =
+                "On-premises S/MIME certificate lifecycle CMS. Clients submit CSRs here only; " +
+                "the CMS alone talks to the certificate authority. Not a mail gateway, relay, DLP, or archive."
         });
     });
     builder.Services.AddCors(options =>
@@ -36,16 +37,8 @@ try
                 .AllowAnyMethod());
     });
 
-    var authMode = builder.Configuration.GetValue<string>("Authentication:Mode") ?? "Development";
-    if (string.Equals(authMode, "EntraId", StringComparison.OrdinalIgnoreCase))
-    {
-        builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration, "AzureAd");
-        builder.Services.AddAuthorization();
-    }
-    else
-    {
-        builder.Services.AddAuthorization(options => options.AddPolicy("default", p => p.RequireAssertion(_ => true)));
-    }
+    // On-premises: Development for lab. Domain-joined Windows/Negotiate auth is a follow-up.
+    builder.Services.AddAuthorization(options => options.AddPolicy("default", p => p.RequireAssertion(_ => true)));
 
     var app = builder.Build();
 
@@ -60,14 +53,15 @@ try
     app.UseCors("admin");
     app.UseSwagger();
     app.UseSwaggerUI();
-    if (string.Equals(authMode, "EntraId", StringComparison.OrdinalIgnoreCase))
-    {
-        app.UseAuthentication();
-    }
-
     app.UseAuthorization();
     app.MapControllers();
-    app.MapGet("/health", () => Results.Ok(new { status = "ok", product = "SmimeLifecycle" }));
+    app.MapGet("/health", () => Results.Ok(new
+    {
+        status = "ok",
+        product = "SmimeLifecycle",
+        role = "CertificateManagementServer",
+        caClient = "cms-only"
+    }));
     if (!app.Configuration.GetValue("Hangfire:Disabled", false))
     {
         app.UseHangfireDashboard("/hangfire");
@@ -85,7 +79,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "API terminated unexpectedly");
+    Log.Fatal(ex, "Certificate Management Server terminated unexpectedly");
     throw;
 }
 finally

@@ -10,7 +10,7 @@ public sealed record UserListItem(
     string Mail,
     string DisplayName,
     bool IsEligible,
-    string? OnPremisesDistinguishedName);
+    string? DistinguishedName);
 
 public sealed record GetUsersQuery : IRequest<IReadOnlyList<UserListItem>>;
 
@@ -20,7 +20,7 @@ public sealed class GetUsersQueryHandler(IApplicationDbContext db) : IRequestHan
     {
         return await db.DirectoryUsers
             .OrderBy(u => u.UserPrincipalName)
-            .Select(u => new UserListItem(u.Id, u.UserPrincipalName, u.Mail, u.DisplayName, u.IsEligible, u.OnPremisesDistinguishedName))
+            .Select(u => new UserListItem(u.Id, u.UserPrincipalName, u.Mail, u.DisplayName, u.IsEligible, u.DistinguishedName))
             .ToListAsync(cancellationToken);
     }
 }

@@ -8,7 +8,8 @@ public sealed class ManagedDevice : Entity
     public string Hostname { get; private set; } = string.Empty;
     public string OsVersion { get; private set; } = string.Empty;
     public string AgentVersion { get; private set; } = string.Empty;
-    public string? EntraDeviceId { get; private set; }
+    /// <summary>Optional AD computer objectGUID when the device is domain-joined.</summary>
+    public string? AdComputerObjectGuid { get; private set; }
     public DateTimeOffset LastSeenAt { get; private set; } = DateTimeOffset.UtcNow;
     public string EnrollmentSecretHash { get; private set; } = string.Empty;
 
@@ -22,7 +23,7 @@ public sealed class ManagedDevice : Entity
         string osVersion,
         string agentVersion,
         string enrollmentSecretHash,
-        string? entraDeviceId)
+        string? adComputerObjectGuid)
     {
         return new ManagedDevice
         {
@@ -31,7 +32,7 @@ public sealed class ManagedDevice : Entity
             OsVersion = osVersion,
             AgentVersion = agentVersion,
             EnrollmentSecretHash = enrollmentSecretHash,
-            EntraDeviceId = entraDeviceId
+            AdComputerObjectGuid = adComputerObjectGuid
         };
     }
 

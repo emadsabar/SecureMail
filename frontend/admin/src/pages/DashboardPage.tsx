@@ -97,8 +97,7 @@ export function DashboardPage() {
     <>
       <Title3>Certificate lifecycle</Title3>
       <Text>
-        Enrollment → issuance → CurrentUser\\My install → AD publish → Entra Connect → Outlook
-        readiness.
+        Enrollment → CMS→CA issuance → CurrentUser\\My install → AD publish → Outlook readiness.
       </Text>
       <div className={styles.grid}>
         {metrics.map(([label, value]) => (
