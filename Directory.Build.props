@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <LangVersion>latest</LangVersion>
+    <Authors>SmimeLifecycle</Authors>
+    <Company>SmimeLifecycle</Company>
+    <Description>Centralized enterprise S/MIME certificate lifecycle management.</Description>
+  </PropertyGroup>
+</Project>

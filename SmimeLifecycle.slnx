@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SmimeLifecycle.Api/SmimeLifecycle.Api.csproj" />
+    <Project Path="src/SmimeLifecycle.Application/SmimeLifecycle.Application.csproj" />
+    <Project Path="src/SmimeLifecycle.Domain/SmimeLifecycle.Domain.csproj" />
+    <Project Path="src/SmimeLifecycle.Infrastructure/SmimeLifecycle.Infrastructure.csproj" />
+    <Project Path="src/SmimeLifecycle.OutlookAddIn/SmimeLifecycle.OutlookAddIn.csproj" />
+    <Project Path="src/SmimeLifecycle.WindowsAgent/SmimeLifecycle.WindowsAgent.csproj" />
+    <Project Path="src/SmimeLifecycle.Worker/SmimeLifecycle.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SmimeLifecycle.Api.Tests/SmimeLifecycle.Api.Tests.csproj" />
+    <Project Path="tests/SmimeLifecycle.Application.Tests/SmimeLifecycle.Application.Tests.csproj" />
+    <Project Path="tests/SmimeLifecycle.Domain.Tests/SmimeLifecycle.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
